@@ -102,6 +102,7 @@ private void cargarCuentas() {
 
         jLabel1.setText("Nombre de la Cuenta:");
         panelFormulario.add(jLabel1);
+        txtNombreCuenta.setPreferredSize(new java.awt.Dimension(200, txtNombreCuenta.getPreferredSize().height));
         panelFormulario.add(txtNombreCuenta);
 
         btnAnadirCuenta.setText("Añadir Cuenta");
@@ -112,10 +113,12 @@ private void cargarCuentas() {
 
         panelCuentas.setLayout(new javax.swing.BoxLayout(panelCuentas, javax.swing.BoxLayout.Y_AXIS));
         jScrollPane1.setViewportView(panelCuentas);
+        jScrollPane1.setPreferredSize(new Dimension(400, 200));
 
         getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         pack();
+        setMinimumSize(new Dimension(400, 300));
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAnadirCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnadirCuentaActionPerformed

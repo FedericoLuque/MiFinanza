@@ -129,6 +129,7 @@ public class LoginView extends javax.swing.JFrame {
         
         // Abrir la ventana principal
         MainView mainView = new MainView();
+        mainView.setLocationRelativeTo(null);
         mainView.setVisible(true);
         
         // Cerrar esta ventana de login

@@ -68,8 +68,9 @@ public class MainView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
-    }//GEN-LAST:event_jButton1ActionPerformed
+        CuentasView cuentasView = new CuentasView();
+        cuentasView.setLocationRelativeTo(null);
+        cuentasView.setVisible(true);}//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
