@@ -27,7 +27,7 @@ public class App {
 
         // 2. Iniciar la ventana principal
         SwingUtilities.invokeLater(() -> {
-            MainView view = new MainView();
+            com.mycompany.mifinanza.views.LoginView view = new com.mycompany.mifinanza.views.LoginView();
             // Centrar la ventana en la pantalla
             view.setLocationRelativeTo(null);
             view.setVisible(true);
