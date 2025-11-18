@@ -123,6 +123,7 @@ public class LoginView extends javax.swing.JFrame {
     com.mycompany.mifinanza.models.Usuario usuario = dao.login(email, password);
 
     if (usuario != null) {
+        com.mycompany.mifinanza.utils.Sesion.setUsuario(usuario);
         // LOGIN EXITOSO
         javax.swing.JOptionPane.showMessageDialog(this, "¡Bienvenido " + usuario.getNombre() + "!");
         
