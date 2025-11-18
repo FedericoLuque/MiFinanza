@@ -1,0 +1,13 @@
+# Archivos compilados por Maven
+target/
+
+# Archivos privados de NetBeans
+nbproject/private/
+build/
+dist/
+nbdist/
+.nb-gradle/
+
+# Archivos de sistema/IDE
+.DS_Store
+*.class
