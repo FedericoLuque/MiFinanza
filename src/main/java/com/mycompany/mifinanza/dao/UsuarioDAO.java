@@ -64,4 +64,22 @@ public class UsuarioDAO {
         }
         return null; // Retorna null si falla el login
     }
+    
+    // ACTUALIZAR CONTRASEÑA
+    public boolean cambiarPassword(int idUsuario, String nuevaPassword) {
+        String sql = "UPDATE Usuario SET password = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, nuevaPassword);
+            pstmt.setInt(2, idUsuario);
+            
+            int filas = pstmt.executeUpdate();
+            return filas > 0;
+            
+        } catch (SQLException e) {
+            System.out.println("Error al cambiar contraseña: " + e.getMessage());
+            return false;
+        }
+    }
 }
