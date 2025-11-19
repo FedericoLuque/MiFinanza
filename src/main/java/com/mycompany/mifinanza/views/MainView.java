@@ -1,9 +1,17 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.mifinanza.views;
 
+import com.mycompany.mifinanza.controllers.CategoriasController;
+import com.mycompany.mifinanza.controllers.CuentasController;
+import com.mycompany.mifinanza.controllers.DashboardController;
+import com.mycompany.mifinanza.controllers.FormularioTransaccionController;
+import com.mycompany.mifinanza.controllers.PresupuestosController;
+import com.mycompany.mifinanza.dao.CategoriaDAO;
+import com.mycompany.mifinanza.dao.CuentaDAO;
+import com.mycompany.mifinanza.dao.DashboardDAO;
+import com.mycompany.mifinanza.dao.MetodoPagoDAO;
+import com.mycompany.mifinanza.dao.PresupuestoDAO;
+import com.mycompany.mifinanza.dao.TransaccionDAO;
+import com.mycompany.mifinanza.dao.UsuarioDAO;
 import com.mycompany.mifinanza.utils.Sesion;
 import com.formdev.flatlaf.FlatClientProperties;
 import java.awt.*;
@@ -20,7 +28,6 @@ public class MainView extends javax.swing.JFrame {
     private JLabel lblSaludo;
 
     public MainView() {
-        // Construimos la interfaz manualmente para tener control total del diseño moderno
         inicializarComponentesModernos();
     }
 
@@ -100,7 +107,7 @@ public class MainView extends javax.swing.JFrame {
                 BorderFactory.createEmptyBorder(10, 10, 10, 10) // Relleno
         ));
 
-        // Efecto de sombra suave (si usas FlatLaf)
+        // Efecto de sombra suave
         btn.putClientProperty(FlatClientProperties.STYLE, "arc: 15; hoverBackground: #F5F5F5");
 
         btn.addActionListener(accion);
@@ -110,23 +117,51 @@ public class MainView extends javax.swing.JFrame {
     // --- ACCIONES ---
 
     private void abrirTransaccion() {
-        new FormularioTransaccionView().setVisible(true);
+        FormularioTransaccionView view = new FormularioTransaccionView();
+        TransaccionDAO transaccionDAO = new TransaccionDAO();
+        CuentaDAO cuentaDAO = new CuentaDAO();
+        CategoriaDAO categoriaDAO = new CategoriaDAO();
+        MetodoPagoDAO metodoPagoDAO = new MetodoPagoDAO();
+        
+        FormularioTransaccionController controller = new FormularioTransaccionController(
+            view, transaccionDAO, cuentaDAO, categoriaDAO, metodoPagoDAO
+        );
+        
+        controller.initController();
+        view.setVisible(true);
     }
 
     private void abrirCuentas() {
-        new CuentasView().setVisible(true);
+        CuentasView view = new CuentasView();
+        CuentaDAO dao = new CuentaDAO();
+        CuentasController controller = new CuentasController(view, dao);
+        controller.initController();
+        view.setVisible(true);
     }
 
     private void abrirPresupuestos() {
-        new PresupuestosView().setVisible(true);
+        PresupuestosView view = new PresupuestosView();
+        PresupuestoDAO presupuestoDAO = new PresupuestoDAO();
+        CategoriaDAO categoriaDAO = new CategoriaDAO(); // El controlador lo necesita para el modal
+        PresupuestosController controller = new PresupuestosController(view, presupuestoDAO, categoriaDAO);
+        controller.initController();
+        view.setVisible(true);
     }
 
     private void abrirCategorias() {
-        new CategoriasView().setVisible(true);
+        CategoriasView view = new CategoriasView();
+        CategoriaDAO dao = new CategoriaDAO();
+        CategoriasController controller = new CategoriasController(view, dao);
+        controller.initController();
+        view.setVisible(true);
     }
 
     private void abrirDashboard() {
-        new DashboardView().setVisible(true);
+        DashboardView view = new DashboardView();
+        DashboardDAO dao = new DashboardDAO();
+        DashboardController controller = new DashboardController(view, dao);
+        controller.initController();
+        view.setVisible(true);
     }
 
     private void abrirConfiguracion() {
@@ -138,7 +173,14 @@ public class MainView extends javax.swing.JFrame {
         if (confirm == JOptionPane.YES_OPTION) {
             this.dispose();
             Sesion.logout();
-            new LoginView().setVisible(true);
+            
+            // Re-abrir LoginView con su controlador
+            LoginView loginView = new LoginView();
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            com.mycompany.mifinanza.controllers.LoginController loginController = new com.mycompany.mifinanza.controllers.LoginController(loginView, usuarioDAO);
+            loginController.initController();
+            loginView.setLocationRelativeTo(null);
+            loginView.setVisible(true);
         }
     }
 }

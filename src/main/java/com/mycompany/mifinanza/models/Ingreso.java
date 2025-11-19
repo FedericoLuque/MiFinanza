@@ -15,7 +15,7 @@ public class Ingreso {
     private double monto;
     private Timestamp fecha;
     private String descripcion;
-    private String fuente; // Quién te paga (Salario, Venta, etc.)
+    private String fuente;
     private int idCuenta;
     private int idCategoria;
     private int idUsuario;

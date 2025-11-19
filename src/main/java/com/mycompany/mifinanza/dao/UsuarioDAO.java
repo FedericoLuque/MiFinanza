@@ -27,7 +27,7 @@ public class UsuarioDAO {
             
             pstmt.setString(1, usuario.getNombre());
             pstmt.setString(2, usuario.getEmail());
-            pstmt.setString(3, usuario.getPassword()); // OJO: Aquí deberíamos encriptar en el futuro
+            pstmt.setString(3, usuario.getPassword());
             
             pstmt.executeUpdate();
             return true;

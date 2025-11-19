@@ -4,19 +4,7 @@
  */
 package com.mycompany.mifinanza.views;
 
-import com.mycompany.mifinanza.dao.DashboardDAO;
-import com.mycompany.mifinanza.utils.Sesion;
-import java.awt.Color;
-import java.util.Map;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import org.knowm.xchart.CategoryChart;
-import org.knowm.xchart.CategoryChartBuilder;
-import org.knowm.xchart.PieChart;
-import org.knowm.xchart.PieChartBuilder;
-import org.knowm.xchart.XChartPanel;
-import org.knowm.xchart.style.Styler;
 
 /**
  *
@@ -24,77 +12,22 @@ import org.knowm.xchart.style.Styler;
  */
 public class DashboardView extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DashboardView.class.getName());
-    private final DashboardDAO dao = new DashboardDAO();
-    
-    /**
-     * Creates new form DashboardView
-     */
     public DashboardView() {
         initComponents();
+        setTitle("Dashboard de Finanzas");
         setLocationRelativeTo(null);
-        setSize(1000, 600); // Hacemos la ventana grandecita
+        setSize(1000, 600);
         setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
-        
-        cargarGraficos();
-    }
-
-    private void cargarGraficos() {
-        if (Sesion.getUsuario() == null) {
-            this.dispose();
-            return;
-        }
-        int idUsuario = Sesion.getUsuario().getId();
-
-        // --- GRÁFICO 1: Gastos por Categoría (Pastel) ---
-        Map<String, Double> datosCat = dao.obtenerGastosPorCategoria(idUsuario);
-        
-        if (datosCat.isEmpty()) {
-            // Si no hay datos, mostrar un aviso simple
-            this.add(new JLabel("No hay gastos registrados para generar gráficos."));
-        } else {
-            // Construir el Gráfico
-            PieChart pieChart = new PieChartBuilder()
-                    .width(400).height(300)
-                    .title("Gastos por Categoría")
-                    .theme(Styler.ChartTheme.GGPlot2) // Tema visual bonito
-                    .build();
-
-            // Llenar datos
-            for (Map.Entry<String, Double> entry : datosCat.entrySet()) {
-                pieChart.addSeries(entry.getKey(), entry.getValue());
-            }
-
-            // Añadir al formulario (Izquierda)
-            // XChartPanel es un JPanel especial que contiene el gráfico
-            JPanel panelPastel = new XChartPanel<>(pieChart);
-            this.add(panelPastel);
-        }
-
-        // --- GRÁFICO 2: Ingresos vs Gastos (Barras) ---
-        double[] balance = dao.obtenerBalanceTotal(idUsuario);
-        
-        CategoryChart barChart = new CategoryChartBuilder()
-                .width(400).height(300)
-                .title("Balance General")
-                .xAxisTitle("Tipo")
-                .yAxisTitle("Monto ($)")
-                .theme(Styler.ChartTheme.Matlab)
-                .build();
-        
-        // Configurar colores de barras (Opcional, XChart lo hace auto si no)
-        barChart.getStyler().setSeriesColors(new Color[] {new Color(46, 204, 113), new Color(231, 76, 60)});
-
-        // Añadir series (Ingresos y Gastos)
-        // XChart necesita arrays para los ejes X e Y
-        barChart.addSeries("Ingresos", java.util.Arrays.asList(new String[]{"Total"}), java.util.Arrays.asList(new Number[]{balance[0]}));
-        barChart.addSeries("Gastos", java.util.Arrays.asList(new String[]{"Total"}), java.util.Arrays.asList(new Number[]{balance[1]}));
-
-        // Añadir al formulario (Derecha)
-        JPanel panelBarras = new XChartPanel<>(barChart);
-        this.add(panelBarras);
     }
     
+    public void setPieChartPanel(JPanel panel) {
+        getContentPane().add(panel);
+    }
+
+    public void setBarChartPanel(JPanel panel) {
+        getContentPane().add(panel);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -110,30 +43,6 @@ public class DashboardView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new DashboardView().setVisible(true));
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables

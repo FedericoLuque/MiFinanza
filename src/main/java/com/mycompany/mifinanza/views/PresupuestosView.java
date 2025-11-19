@@ -4,9 +4,7 @@
  */
 package com.mycompany.mifinanza.views;
 
-import com.mycompany.mifinanza.dao.PresupuestoDAO;
 import com.mycompany.mifinanza.models.Presupuesto;
-import com.mycompany.mifinanza.utils.Sesion;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
@@ -17,40 +15,22 @@ import javax.swing.border.EmptyBorder;
  * @author federico
  */
 public class PresupuestosView extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(PresupuestosView.class.getName());
 
-    private final PresupuestoDAO dao = new PresupuestoDAO();
-    
-    
-    /**
-     * Creates new form PresupuestosView
-     */
     public PresupuestosView() {
         initComponents();
+        setTitle("Mis Presupuestos");
         this.setSize(800, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
-        
-        cargarPresupuestos();
     }
 
-    public void cargarPresupuestos() {
-        // 1. Protección de Sesión
-        if (Sesion.getUsuario() == null) {
-            this.dispose();
-            return;
-        }
-
+    public void mostrarPresupuestos(List<Presupuesto> lista) {
         panelListado.removeAll();
-        int idUsuario = Sesion.getUsuario().getId();
-        List<Presupuesto> lista = dao.listarConProgreso(idUsuario);
 
         if (lista.isEmpty()) {
             panelListado.add(new JLabel("No tienes presupuestos activos. ¡Crea uno!"));
         } else {
             for (Presupuesto p : lista) {
-                // --- CREAR TARJETA ---
                 JPanel card = new JPanel();
                 card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
                 card.setBorder(BorderFactory.createCompoundBorder(
@@ -58,9 +38,8 @@ public class PresupuestosView extends javax.swing.JFrame {
                         new EmptyBorder(15, 15, 15, 15)
                 ));
                 card.setBackground(Color.WHITE);
-                card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100)); // Altura fija
+                card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
-                // --- FILA 1: TÍTULO Y FECHAS ---
                 JPanel headerPanel = new JPanel(new BorderLayout());
                 headerPanel.setBackground(Color.WHITE);
                 
@@ -73,33 +52,34 @@ public class PresupuestosView extends javax.swing.JFrame {
                 headerPanel.add(lblCategoria, BorderLayout.WEST);
                 headerPanel.add(lblFechas, BorderLayout.EAST);
                 
-                // --- FILA 2: BARRA DE PROGRESO ---
                 JProgressBar progressBar = new JProgressBar(0, (int) p.getMontoAsignado());
                 progressBar.setValue((int) p.getMontoGastado());
                 progressBar.setStringPainted(true);
                 
-                // Color dinámico: Verde si va bien, Rojo si se pasa
                 if (p.getMontoGastado() > p.getMontoAsignado()) {
                     progressBar.setForeground(Color.RED);
-                    progressBar.setString("¡EXCEDIDO! " + p.getMontoGastado() + " / " + p.getMontoAsignado());
+                    progressBar.setString("¡EXCEDIDO! " + String.format("%.2f", p.getMontoGastado()) + " / " + String.format("%.2f", p.getMontoAsignado()));
                 } else {
-                    progressBar.setForeground(new Color(50, 205, 50)); // Lime Green
-                    progressBar.setString("Gastado: " + p.getMontoGastado() + " / " + p.getMontoAsignado());
+                    progressBar.setForeground(new Color(50, 205, 50));
+                    progressBar.setString("Gastado: " + String.format("%.2f", p.getMontoGastado()) + " / " + String.format("%.2f", p.getMontoAsignado()));
                 }
 
-                // --- AÑADIR AL PANEL ---
                 card.add(headerPanel);
-                card.add(Box.createVerticalStrut(10)); // Espacio
+                card.add(Box.createVerticalStrut(10));
                 card.add(progressBar);
                 
                 panelListado.add(card);
             }
         }
         
-        panelListado.add(Box.createVerticalGlue()); // Empujar todo hacia arriba
+        panelListado.add(Box.createVerticalGlue());
         panelListado.revalidate();
         panelListado.repaint();
-    } 
+    }
+    
+    public JButton getBtnCrear() {
+        return btnCrear;
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -118,15 +98,16 @@ public class PresupuestosView extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setText("Mis Presupuestos");
         jPanel1.add(jLabel1);
 
         btnCrear.setText("Crear Nuevo Presupuesto");
-        btnCrear.addActionListener(this::btnCrearActionPerformed);
         jPanel1.add(btnCrear);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_START);
 
+        panelListado.setBackground(new java.awt.Color(255, 255, 255));
         panelListado.setLayout(new javax.swing.BoxLayout(panelListado, javax.swing.BoxLayout.Y_AXIS));
         jScrollPane1.setViewportView(panelListado);
 
@@ -134,38 +115,6 @@ public class PresupuestosView extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnCrearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearActionPerformed
-        // Aquí abriremos el Modal de Crear Presupuesto en el siguiente paso
-        // Por ahora, crearemos uno rápido de prueba para ver si funciona la lista
-        // new ModalCrearPresupuesto(this, true).setVisible(true); 
-        new ModalCrearPresupuesto(this, true).setVisible(true);
-    }//GEN-LAST:event_btnCrearActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new PresupuestosView().setVisible(true));
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCrear;

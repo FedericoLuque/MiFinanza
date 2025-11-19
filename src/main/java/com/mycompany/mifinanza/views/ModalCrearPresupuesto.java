@@ -4,52 +4,54 @@
  */
 package com.mycompany.mifinanza.views;
 
-import com.mycompany.mifinanza.dao.CategoriaDAO;
-import com.mycompany.mifinanza.dao.PresupuestoDAO;
-import com.mycompany.mifinanza.models.Categoria;
-import com.mycompany.mifinanza.models.Presupuesto;
-import com.mycompany.mifinanza.utils.Sesion;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+
 /**
  *
  * @author federico
  */
 public class ModalCrearPresupuesto extends javax.swing.JDialog {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ModalCrearPresupuesto.class.getName());
-
-    private final CategoriaDAO catDao = new CategoriaDAO();
-    private final PresupuestoDAO preDao = new PresupuestoDAO();
-    private final PresupuestosView padre; // Referencia a la ventana padre para refrescarla
-
-    
-    /**
-     * Creates new form ModalCrearPresupuesto
-     */
     public ModalCrearPresupuesto(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        this.padre = (PresupuestosView) parent;
         initComponents();
-        setLocationRelativeTo(null);
-        
-        cargarCategorias();
+        setTitle("Crear Nuevo Presupuesto");
+        setLocationRelativeTo(parent);
         
         // Pre-llenar fechas para facilitar la vida (Mes actual)
         LocalDate hoy = LocalDate.now();
         txtFechaInicio.setText(hoy.withDayOfMonth(1).toString()); // Primer día del mes
         txtFechaFin.setText(hoy.withDayOfMonth(hoy.lengthOfMonth()).toString()); // Último día
-
-    }
-
-    private void cargarCategorias() {
-        List<Categoria> lista = catDao.listar();
-        cbCategoria.setModel(new DefaultComboBoxModel(lista.toArray()));
     }
     
+    public void setCategoriasModel(DefaultComboBoxModel model) {
+        this.cbCategoria.setModel(model);
+    }
+    
+    public JButton getBtnGuardar() {
+        return btnGuardar;
+    }
+
+    public JComboBox getCbCategoria() {
+        return cbCategoria;
+    }
+
+    public JTextField getTxtFechaFin() {
+        return txtFechaFin;
+    }
+
+    public JTextField getTxtFechaInicio() {
+        return txtFechaInicio;
+    }
+
+    public JTextField getTxtMonto() {
+        return txtMonto;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -73,8 +75,6 @@ public class ModalCrearPresupuesto extends javax.swing.JDialog {
 
         jLabel1.setText("Categoria");
 
-        cbCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         jLabel2.setText("Monto Máximo");
 
         jLabel3.setText("Desde (YYYY-MM-DD)");
@@ -82,7 +82,6 @@ public class ModalCrearPresupuesto extends javax.swing.JDialog {
         jLabel4.setText("Hasta (YYYY-MM-DD)");
 
         btnGuardar.setText("Guardar Presupuesto");
-        btnGuardar.addActionListener(this::btnGuardarActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -97,18 +96,18 @@ public class ModalCrearPresupuesto extends javax.swing.JDialog {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(8, 8, 8)
                                 .addComponent(jLabel1))
-                            .addComponent(cbCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(31, 31, 31)
+                            .addComponent(cbCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtMonto)))
+                            .addComponent(txtMonto, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(txtFechaInicio, javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(txtFechaFin, javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(196, Short.MAX_VALUE))
+                .addContainerGap(147, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -121,102 +120,21 @@ public class ModalCrearPresupuesto extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cbCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtMonto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtFechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtFechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(btnGuardar)
-                .addContainerGap(95, Short.MAX_VALUE))
+                .addContainerGap(75, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        try {
-            // 1. Validar datos
-            Categoria cat = (Categoria) cbCategoria.getSelectedItem();
-            double monto = Double.parseDouble(txtMonto.getText());
-            LocalDate fechaIn = LocalDate.parse(txtFechaInicio.getText());
-            LocalDate fechaFi = LocalDate.parse(txtFechaFin.getText());
-
-            if (cat == null) {
-                JOptionPane.showMessageDialog(this, "Selecciona una categoría.");
-                return;
-            }
-            
-            if (fechaFi.isBefore(fechaIn)) {
-                JOptionPane.showMessageDialog(this, "La fecha final no puede ser antes de la inicial.");
-                return;
-            }
-
-            // 2. Crear objeto
-            Presupuesto nuevo = new Presupuesto(
-                monto, 
-                fechaIn, 
-                fechaFi, 
-                cat.getId()
-            );
-            
-            // 3. Guardar con el usuario actual
-            int idUsuario = Sesion.getUsuario().getId();
-            
-            if (preDao.insertar(nuevo, idUsuario)) {
-                JOptionPane.showMessageDialog(this, "Presupuesto creado.");
-                padre.cargarPresupuestos(); // ¡Truco! Refrescamos la ventana de atrás
-                this.dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al guardar.");
-            }
-
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "El monto debe ser un número.");
-        } catch (DateTimeParseException e) {
-            JOptionPane.showMessageDialog(this, "Formato de fecha incorrecto (YYYY-MM-DD).");
-        }
-    }//GEN-LAST:event_btnGuardarActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                ModalCrearPresupuesto dialog = new ModalCrearPresupuesto(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardar;

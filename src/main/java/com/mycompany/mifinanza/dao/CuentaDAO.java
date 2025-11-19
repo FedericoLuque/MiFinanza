@@ -64,5 +64,4 @@ public class CuentaDAO {
         return lista;
     }
     
-    // NOTA: Los métodos actualizar y eliminar se añadirán después de validar la inserción
 }
