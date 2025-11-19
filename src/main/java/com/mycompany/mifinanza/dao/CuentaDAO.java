@@ -22,8 +22,7 @@ public class CuentaDAO {
 
     // INSERTAR
     public boolean insertar(Cuenta cuenta) {
-        // id_usuario se obtiene de la clase Cuenta, que a su vez lo obtiene de la Sesion
-        String sql = "INSERT INTO Cuenta(nombre_cuenta, id_usuario) VALUES(?, ?)";
+        String sql = "INSERT INTO Cuenta(nombre_cuenta, saldo, id_usuario) VALUES(?, 0, ?)";
         
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -40,10 +39,18 @@ public class CuentaDAO {
         }
     }
 
-    // LISTAR CUENTAS POR USUARIO (CRUCIAL para seguridad)
+    // LISTAR CUENTAS POR USUARIO CON SALDO REAL
     public List<Cuenta> listarPorUsuario(int idUsuario) {
         List<Cuenta> lista = new ArrayList<>();
-        String sql = "SELECT id, nombre_cuenta, id_usuario FROM Cuenta WHERE id_usuario = ?";
+        String sql = """
+            SELECT 
+                c.id, 
+                c.nombre_cuenta, 
+                c.id_usuario,
+                c.saldo
+            FROM Cuenta c
+            WHERE c.id_usuario = ?
+        """;
         
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -55,6 +62,7 @@ public class CuentaDAO {
                 lista.add(new Cuenta(
                     rs.getInt("id"),
                     rs.getString("nombre_cuenta"),
+                    rs.getDouble("saldo"),
                     rs.getInt("id_usuario")
                 ));
             }
@@ -63,5 +71,4 @@ public class CuentaDAO {
         }
         return lista;
     }
-    
 }

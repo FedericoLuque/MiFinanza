@@ -42,8 +42,17 @@ public class CuentasView extends javax.swing.JFrame {
                 JLabel lblNombre = new JLabel(c.getNombre());
                 lblNombre.setFont(lblNombre.getFont().deriveFont(Font.BOLD, 14f));
 
-                JLabel lblSaldo = new JLabel("$0.00 (Simulado)");
-                lblSaldo.setForeground(Color.decode("#10B981"));
+                // Usar el saldo real y darle formato
+                String saldoFormateado = String.format("$%,.2f", c.getSaldo());
+                JLabel lblSaldo = new JLabel(saldoFormateado);
+                
+                // Cambiar color según el saldo
+                if (c.getSaldo() < 0) {
+                    lblSaldo.setForeground(Color.RED);
+                } else {
+                    lblSaldo.setForeground(Color.decode("#10B981")); // Verde
+                }
+                
                 lblSaldo.setFont(lblSaldo.getFont().deriveFont(Font.BOLD, 14f));
 
                 card.add(lblNombre, BorderLayout.WEST);
