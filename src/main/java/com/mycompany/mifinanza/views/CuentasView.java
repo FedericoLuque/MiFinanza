@@ -4,13 +4,11 @@
  */
 package com.mycompany.mifinanza.views;
 
-import com.mycompany.mifinanza.dao.CuentaDAO;
 import com.mycompany.mifinanza.models.Cuenta;
-import com.mycompany.mifinanza.utils.Sesion;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder; // Importamos el borde para limpieza
+import javax.swing.border.EmptyBorder;
 
 /**
  *
@@ -18,68 +16,56 @@ import javax.swing.border.EmptyBorder; // Importamos el borde para limpieza
  */
 public class CuentasView extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CuentasView.class.getName());
-
-    /**
-     * Creates new form CuentasView
-     */
     public CuentasView() {
         initComponents();
-        cargarCuentas(); 
+        setTitle("Gestión de Cuentas");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
     }
+    
+    public void mostrarCuentas(List<Cuenta> lista) {
+        panelCuentas.removeAll();
 
-    CuentaDAO dao = new CuentaDAO();
+        if (lista.isEmpty()) {
+            panelCuentas.add(new JLabel("No hay cuentas registradas."));
+        } else {
+            for (Cuenta c : lista) {
+                JPanel card = new JPanel(new BorderLayout(10, 10));
+                card.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
+                        new EmptyBorder(10, 15, 10, 15)
+                ));
+                card.setBackground(Color.WHITE);
+                card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
+                card.setPreferredSize(new Dimension(350, 70));
 
-private void cargarCuentas() {
-    // Limpiar el contenedor antes de añadir nuevos elementos
-    panelCuentas.removeAll();
+                JLabel lblNombre = new JLabel(c.getNombre());
+                lblNombre.setFont(lblNombre.getFont().deriveFont(Font.BOLD, 14f));
 
-    // 1. Obtener el ID del usuario logueado
-    int idUsuario = Sesion.getUsuario().getId();
-    List<Cuenta> lista = dao.listarPorUsuario(idUsuario);
+                JLabel lblSaldo = new JLabel("$0.00 (Simulado)");
+                lblSaldo.setForeground(Color.decode("#10B981"));
+                lblSaldo.setFont(lblSaldo.getFont().deriveFont(Font.BOLD, 14f));
 
-    if (lista.isEmpty()) {
-        panelCuentas.add(new JLabel("No hay cuentas registradas. Usa el formulario de arriba."));    } else {
-        for (Cuenta c : lista) {
-            // Crear la "tarjeta" visual para la cuenta
-            JPanel card = new JPanel(new BorderLayout(10, 10));
-            // Configurar el estilo de la tarjeta
-            card.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY), // Línea divisoria en la parte inferior
-                    new EmptyBorder(10, 15, 10, 15) // Padding interno
-            ));
-            card.setBackground(Color.WHITE);
+                card.add(lblNombre, BorderLayout.WEST);
+                card.add(lblSaldo, BorderLayout.EAST);
 
-            // --- Ajuste clave para BoxLayout: el tamaño máximo debe ser el mismo que el preferido
-            // Esto asegura que Box Layout apile las tarjetas verticalmente sin estirarlas horizontalmente
-            card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70)); 
-            card.setPreferredSize(new Dimension(350, 70)); 
-            // ------------------------------------------
-
-            JLabel lblNombre = new JLabel(c.getNombre());
-            lblNombre.setFont(lblNombre.getFont().deriveFont(Font.BOLD, 14f));
-
-            JLabel lblSaldo = new JLabel("$0.00 (Simulado)");
-            lblSaldo.setForeground(Color.decode("#10B981")); // Verde
-            lblSaldo.setFont(lblSaldo.getFont().deriveFont(Font.BOLD, 14f));
-
-            card.add(lblNombre, BorderLayout.WEST);
-            card.add(lblSaldo, BorderLayout.EAST);
-
-            panelCuentas.add(card);
+                panelCuentas.add(card);
+            }
         }
+
+        panelCuentas.add(Box.createVerticalGlue());
+        panelCuentas.revalidate();
+        panelCuentas.repaint();
+    }
+    
+    public JButton getBtnAnadirCuenta() {
+        return btnAnadirCuenta;
     }
 
-    // Espaciador para empujar las tarjetas hacia arriba (solo con BoxLayout)
-    panelCuentas.add(Box.createVerticalGlue()); 
+    public JTextField getTxtNombreCuenta() {
+        return txtNombreCuenta;
+    }
 
-    // Refrescar y revalidar el contenedor del scroll
-    panelCuentas.revalidate();
-    panelCuentas.repaint();
-}
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -102,11 +88,11 @@ private void cargarCuentas() {
 
         jLabel1.setText("Nombre de la Cuenta:");
         panelFormulario.add(jLabel1);
+        
         txtNombreCuenta.setPreferredSize(new java.awt.Dimension(200, txtNombreCuenta.getPreferredSize().height));
         panelFormulario.add(txtNombreCuenta);
 
         btnAnadirCuenta.setText("Añadir Cuenta");
-        btnAnadirCuenta.addActionListener(this::btnAnadirCuentaActionPerformed);
         panelFormulario.add(btnAnadirCuenta);
 
         getContentPane().add(panelFormulario, java.awt.BorderLayout.PAGE_START);
@@ -120,29 +106,6 @@ private void cargarCuentas() {
         pack();
         setMinimumSize(new Dimension(400, 300));
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnAnadirCuentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnadirCuentaActionPerformed
-    String nombre = txtNombreCuenta.getText();
-    if (nombre.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Escribe un nombre para la cuenta.");
-        return;
-    }
-
-    int idUsuario = Sesion.getUsuario().getId();
-    Cuenta nuevaCuenta = new Cuenta(nombre, idUsuario);
-
-    if (dao.insertar(nuevaCuenta)) {
-        JOptionPane.showMessageDialog(this, "Cuenta guardada con éxito.");
-        txtNombreCuenta.setText("");
-        cargarCuentas(); // Actualizar la lista
-    } else {
-        JOptionPane.showMessageDialog(this, "Error al guardar la cuenta.");
-    }
-    }//GEN-LAST:event_btnAnadirCuentaActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAnadirCuenta;

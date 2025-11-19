@@ -4,8 +4,9 @@
  */
 package com.mycompany.mifinanza.views;
 
-import com.mycompany.mifinanza.dao.UsuarioDAO;
-import com.mycompany.mifinanza.models.Usuario;
+import javax.swing.JButton;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 /**
  *
@@ -13,13 +14,20 @@ import com.mycompany.mifinanza.models.Usuario;
  */
 public class LoginView extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LoginView.class.getName());
-
-    /**
-     * Creates new form LoginView
-     */
     public LoginView() {
         initComponents();
+    }
+    
+    public JButton getBtnLogin() {
+        return btnLogin;
+    }
+
+    public JPasswordField getTxtPassword() {
+        return txtPassword;
+    }
+
+    public JTextField getTxtEmail() {
+        return txtEmail;
     }
 
     /**
@@ -47,7 +55,6 @@ public class LoginView extends javax.swing.JFrame {
         jLabel3.setText("Contraseña");
 
         btnLogin.setText("Ingresar");
-        btnLogin.addActionListener(this::btnLoginActionPerformed);
 
         txtPassword.addActionListener(this::txtPasswordActionPerformed);
 
@@ -97,67 +104,14 @@ public class LoginView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
-        // TODO add your handling code here:
+        // Este evento puede usarse para que al presionar Enter en el campo de contraseña, se dispare el login
+        btnLogin.doClick();
     }//GEN-LAST:event_txtPasswordActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        // OBTENER DATOS DE LA VISTA
-    String email = txtEmail.getText();
-    String password = new String(txtPassword.getPassword());
 
-    // VALIDACIÓN BÁSICA
-    if (email.isEmpty() || password.isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Por favor, llena todos los campos.");
-        return;
-    }
-
-    // LLAMADA AL CONTROLADOR / DAO
-    // Asegúrate de importar tu UsuarioDAO y Usuario al principio del archivo si hace falta
-    com.mycompany.mifinanza.dao.UsuarioDAO dao = new com.mycompany.mifinanza.dao.UsuarioDAO();
-    com.mycompany.mifinanza.models.Usuario usuario = dao.login(email, password);
-
-    if (usuario != null) {
-        com.mycompany.mifinanza.utils.Sesion.setUsuario(usuario);
-        // LOGIN EXITOSO
-        javax.swing.JOptionPane.showMessageDialog(this, "¡Bienvenido " + usuario.getNombre() + "!");
-        
-        // Abrir la ventana principal
-        MainView mainView = new MainView();
-        mainView.setLocationRelativeTo(null);
-        mainView.setVisible(true);
-        
-        // Cerrar esta ventana de login
-        this.dispose();
-    } else {
-        // LOGIN FALLIDO
-        javax.swing.JOptionPane.showMessageDialog(this, "Email o contraseña incorrectos.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-    }
     }//GEN-LAST:event_btnLoginActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new LoginView().setVisible(true));
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogin;

@@ -33,7 +33,7 @@ public class Categoria {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
     
-    // Importante para que el ComboBox muestre el nombre y no "com.mycompany..."
+    //Para que el ComboBox muestre el nombre 
     @Override
     public String toString() {
         return nombre;

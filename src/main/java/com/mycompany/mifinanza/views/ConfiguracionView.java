@@ -17,9 +17,6 @@ public class ConfiguracionView extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ConfiguracionView.class.getName());
 
-    /**
-     * Creates new form ConfiguracionView
-     */
     public ConfiguracionView() {
         initComponents();
         setLocationRelativeTo(null);

@@ -4,14 +4,16 @@
  */
 package com.mycompany.mifinanza.views;
 
-import com.mycompany.mifinanza.dao.CategoriaDAO;
 import com.mycompany.mifinanza.models.Categoria;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.util.List;
 import javax.swing.BoxLayout;
-import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
@@ -21,38 +23,45 @@ import javax.swing.table.DefaultTableModel;
  */
 public class CategoriasView extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CategoriasView.class.getName());
-
-    /**
-     * Creates new form CategoriasView
-     */
     public CategoriasView() {
         initComponents();
-        cargarTabla(); // <--- AÑADE ESTA LÍNEA
-        setLocationRelativeTo(null); // Centrar ventana
-        setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE); // Solo cerrar esta ventana, no la app
-}
+        setTitle("Gestión de Categorías");
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
+    }
+    
+    public void mostrarCategorias(List<Categoria> lista) {
+        String[] columnas = {"ID", "Nombre"};
+        DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Hacer que la tabla no sea editable
+            }
+        };
 
-    // Instancia del DAO para usar en toda la clase
-CategoriaDAO dao = new CategoriaDAO();
-
-private void cargarTabla() {
-    // 1. Definir las columnas
-    String[] columnas = {"ID", "Nombre"};
-    DefaultTableModel modelo = new DefaultTableModel(columnas, 0);
-
-    // 2. Pedir los datos al DAO
-    List<Categoria> lista = dao.listar();
-
-    // 3. Llenar el modelo
-    for (Categoria c : lista) {
-        Object[] fila = {c.getId(), c.getNombre()};
-        modelo.addRow(fila);
+        for (Categoria c : lista) {
+            Object[] fila = {c.getId(), c.getNombre()};
+            modelo.addRow(fila);
+        }
+        
+        tblCategorias.setModel(modelo);
     }
 
-    // 4. Asignar el modelo a la tabla visual
-    tblCategorias.setModel(modelo);
-}
+    public JTable getTblCategorias() {
+        return tblCategorias;
+    }
+
+    public JButton getBtnGuardar() {
+        return btnGuardar;
+    }
+
+    public JButton getBtnEliminar() {
+        return btnEliminar;
+    }
+
+    public JTextField getTxtNombre() {
+        return txtNombre;
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -66,22 +75,19 @@ private void cargarTabla() {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblCategorias = new javax.swing.JTable();
         
-        // Panel para el formulario superior
         JPanel panelFormulario = new JPanel();
         panelFormulario.setLayout(new BoxLayout(panelFormulario, BoxLayout.Y_AXIS));
         panelFormulario.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // Panel para la fila de input
         JPanel panelInput = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        jLabel1 = new javax.swing.JLabel("Nombre de Categoria:");
-        txtNombre = new javax.swing.JTextField(20); // Ancho de 20 caracteres
+        jLabel1 = new JLabel("Nombre de Categoria:");
+        txtNombre = new JTextField(20);
         panelInput.add(jLabel1);
         panelInput.add(txtNombre);
         
-        // Panel para la fila de botones
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        btnGuardar = new javax.swing.JButton("Guardar");
-        btnEliminar = new javax.swing.JButton("Eliminar");
+        btnGuardar = new JButton("Guardar");
+        btnEliminar = new JButton("Eliminar");
         panelBotones.add(btnGuardar);
         panelBotones.add(btnEliminar);
 
@@ -98,65 +104,17 @@ private void cargarTabla() {
         ));
         jScrollPane1.setViewportView(tblCategorias);
         getContentPane().add(jScrollPane1, BorderLayout.CENTER);
-
-        // --- Action Listeners ---
-        btnGuardar.addActionListener(this::btnGuardarActionPerformed);
-        btnEliminar.addActionListener(this::btnEliminarActionPerformed);
         
         pack();
         
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtNombreActionPerformed
-
-    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        String nombre = txtNombre.getText();
-if (nombre.isEmpty()) {
-    JOptionPane.showMessageDialog(this, "Escribe un nombre.");
-    return;
-}
-
-Categoria nuevaCat = new Categoria(nombre);
-if (dao.insertar(nuevaCat)) {
-    JOptionPane.showMessageDialog(this, "Categoría guardada.");
-    txtNombre.setText(""); // Limpiar campo
-    cargarTabla(); // Actualizar tabla
-} else {
-    JOptionPane.showMessageDialog(this, "Error al guardar.");
-}
-    }//GEN-LAST:event_btnGuardarActionPerformed
-
-    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        int filaSeleccionada = tblCategorias.getSelectedRow();
-if (filaSeleccionada == -1) {
-    JOptionPane.showMessageDialog(this, "Selecciona una categoría de la tabla.");
-    return;
-}
-
-// Obtener el ID de la columna 0 (que es el ID)
-int id = (int) tblCategorias.getValueAt(filaSeleccionada, 0);
-
-// Confirmación
-int confirm = JOptionPane.showConfirmDialog(this, "¿Seguro que quieres eliminarla?", "Confirmar", JOptionPane.YES_NO_OPTION);
-
-if (confirm == JOptionPane.YES_OPTION) {
-    if (dao.eliminar(id)) {
-        cargarTabla(); // Actualizar tabla
-    } else {
-        JOptionPane.showMessageDialog(this, "Error al eliminar.");
-    }
-}
-    }//GEN-LAST:event_btnEliminarActionPerformed
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnEliminar;
-    private javax.swing.JButton btnGuardar;
-    private javax.swing.JLabel jLabel1;
+    private JButton btnEliminar;
+    private JButton btnGuardar;
+    private JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tblCategorias;
-    private javax.swing.JTextField txtNombre;
+    private JTable tblCategorias;
+    private JTextField txtNombre;
     // End of variables declaration//GEN-END:variables
 }

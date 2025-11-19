@@ -4,21 +4,11 @@
  */
 package com.mycompany.mifinanza.views;
 
-import com.mycompany.mifinanza.dao.CategoriaDAO;
-import com.mycompany.mifinanza.dao.CuentaDAO;
-import com.mycompany.mifinanza.dao.MetodoPagoDAO;
-import com.mycompany.mifinanza.dao.TransaccionDAO;
-import com.mycompany.mifinanza.models.Categoria;
-import com.mycompany.mifinanza.models.Cuenta;
-import com.mycompany.mifinanza.models.Gasto;
-import com.mycompany.mifinanza.models.Ingreso;
-import com.mycompany.mifinanza.models.MetodoPago;
-import com.mycompany.mifinanza.utils.Sesion;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
 
 /**
  *
@@ -26,57 +16,40 @@ import javax.swing.JOptionPane;
  */
 public class FormularioTransaccionView extends javax.swing.JFrame {
     
-    // Instancias de los DAOs para acceder a la BD
-    private final CuentaDAO cuentaDAO = new CuentaDAO();
-    private final CategoriaDAO categoriaDAO = new CategoriaDAO();
-    private final MetodoPagoDAO metodoPagoDAO = new MetodoPagoDAO();
-    private final TransaccionDAO transaccionDAO = new TransaccionDAO();
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormularioTransaccionView.class.getName());
-
-    /**
-     * Creates new form FormularioTransaccionView
-     */
     public FormularioTransaccionView() {
         initComponents();
+        setTitle("Registrar Transacción");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
         
-        // Cargar los datos en los desplegables al iniciar
-        cargarCombos();
-        
-        // Poner la fecha de hoy por defecto para ayudar al usuario
-        String hoy = LocalDate.now().toString(); // Formato YYYY-MM-DD
+        String hoy = LocalDate.now().toString();
         txtFechaGasto.setText(hoy);
         txtFechaIngreso.setText(hoy);
     }
     
-    private void cargarCombos() {
-        // 1. Obtener usuario actual para filtrar sus cuentas
-        int idUsuario = Sesion.getUsuario().getId();
-        
-        // 2. Cargar Cuentas (Mismo modelo para ambos combos)
-        List<Cuenta> cuentas = cuentaDAO.listarPorUsuario(idUsuario);
-        // Usamos un array para el modelo del combo
-        DefaultComboBoxModel modelCuentasGasto = new DefaultComboBoxModel(cuentas.toArray());
-        DefaultComboBoxModel modelCuentasIngreso = new DefaultComboBoxModel(cuentas.toArray());
-        
-        cbCuentaGasto.setModel(modelCuentasGasto);
-        cbCuentaIngreso.setModel(modelCuentasIngreso);
-        
-        // 3. Cargar Categorías
-        List<Categoria> categorias = categoriaDAO.listar();
-        DefaultComboBoxModel modelCatGasto = new DefaultComboBoxModel(categorias.toArray());
-        DefaultComboBoxModel modelCatIngreso = new DefaultComboBoxModel(categorias.toArray());
-        
-        cbCategoriaGasto.setModel(modelCatGasto);
-        cbCategoriaIngreso.setModel(modelCatIngreso);
-        
-        // 4. Cargar Métodos de Pago (Solo para Gasto)
-        List<MetodoPago> metodos = metodoPagoDAO.listar();
-        cbMetodoPago.setModel(new DefaultComboBoxModel(metodos.toArray()));
-    }
-    
+    // --- Setters para los ComboBox ---
+    public void setCuentasGastoModel(DefaultComboBoxModel model) { cbCuentaGasto.setModel(model); }
+    public void setCuentasIngresoModel(DefaultComboBoxModel model) { cbCuentaIngreso.setModel(model); }
+    public void setCategoriasGastoModel(DefaultComboBoxModel model) { cbCategoriaGasto.setModel(model); }
+    public void setCategoriasIngresoModel(DefaultComboBoxModel model) { cbCategoriaIngreso.setModel(model); }
+    public void setMetodosPagoModel(DefaultComboBoxModel model) { cbMetodoPago.setModel(model); }
+
+    // --- Getters para todos los componentes del formulario ---
+    public JButton getBtnGuardarGasto() { return btnGuardarGasto; }
+    public JButton getBtnGuardarIngreso() { return btnGuardarIngreso; }
+    public JComboBox getCbCategoriaGasto() { return cbCategoriaGasto; }
+    public JComboBox getCbCategoriaIngreso() { return cbCategoriaIngreso; }
+    public JComboBox getCbCuentaGasto() { return cbCuentaGasto; }
+    public JComboBox getCbCuentaIngreso() { return cbCuentaIngreso; }
+    public JComboBox getCbMetodoPago() { return cbMetodoPago; }
+    public JTextField getTxtComercio() { return txtComercio; }
+    public JTextField getTxtDescGasto() { return txtDescGasto; }
+    public JTextField getTxtDescIngreso() { return txtDescIngreso; }
+    public JTextField getTxtFechaGasto() { return txtFechaGasto; }
+    public JTextField getTxtFechaIngreso() { return txtFechaIngreso; }
+    public JTextField getTxtFuente() { return txtFuente; }
+    public JTextField getTxtMontoGasto() { return txtMontoGasto; }
+    public JTextField getTxtMontoIngreso() { return txtMontoIngreso; }
     
 
     /**
@@ -109,24 +82,21 @@ public class FormularioTransaccionView extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        txtMontoGasto.setText("Monto Gasto");
-        txtMontoGasto.addActionListener(this::txtMontoGastoActionPerformed);
+        txtMontoGasto.setBorder(javax.swing.BorderFactory.createTitledBorder("Monto Gasto"));
 
-        txtDescGasto.setText("Descripcion");
+        txtDescGasto.setBorder(javax.swing.BorderFactory.createTitledBorder("Descripción"));
 
-        txtComercio.setText("Comercio");
+        txtComercio.setBorder(javax.swing.BorderFactory.createTitledBorder("Comercio"));
 
-        cbCuentaGasto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cbCuentaGasto.addActionListener(this::cbCuentaGastoActionPerformed);
+        cbCuentaGasto.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuenta"));
 
-        cbCategoriaGasto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbCategoriaGasto.setBorder(javax.swing.BorderFactory.createTitledBorder("Categoría"));
 
-        cbMetodoPago.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbMetodoPago.setBorder(javax.swing.BorderFactory.createTitledBorder("Método de Pago"));
 
-        txtFechaGasto.setText("Fecha Gasto");
+        txtFechaGasto.setBorder(javax.swing.BorderFactory.createTitledBorder("Fecha (YYYY-MM-DD)"));
 
-        btnGuardarGasto.setText("Guardar gasto");
-        btnGuardarGasto.addActionListener(this::btnGuardarGastoActionPerformed);
+        btnGuardarGasto.setText("Guardar Gasto");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -134,16 +104,16 @@ public class FormularioTransaccionView extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtMontoGasto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDescGasto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtComercio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbCuentaGasto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbCategoriaGasto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbMetodoPago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFechaGasto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnGuardarGasto))
-                .addContainerGap(177, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnGuardarGasto)
+                    .addComponent(txtMontoGasto)
+                    .addComponent(txtDescGasto)
+                    .addComponent(txtComercio)
+                    .addComponent(cbCuentaGasto, 0, 250, Short.MAX_VALUE)
+                    .addComponent(cbCategoriaGasto, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cbMetodoPago, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtFechaGasto))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -162,42 +132,42 @@ public class FormularioTransaccionView extends javax.swing.JFrame {
                 .addComponent(cbMetodoPago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtFechaGasto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addComponent(btnGuardarGasto)
-                .addContainerGap(36, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Registrar Gasto", jPanel1);
 
-        txtMontoIngreso.setText("Monto Ingreso");
+        txtMontoIngreso.setBorder(javax.swing.BorderFactory.createTitledBorder("Monto Ingreso"));
 
-        txtDescIngreso.setText("Descripcion");
+        txtDescIngreso.setBorder(javax.swing.BorderFactory.createTitledBorder("Descripción"));
 
-        txtFuente.setText("Fuente");
+        txtFuente.setBorder(javax.swing.BorderFactory.createTitledBorder("Fuente"));
 
-        cbCuentaIngreso.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbCuentaIngreso.setBorder(javax.swing.BorderFactory.createTitledBorder("Cuenta"));
 
-        cbCategoriaIngreso.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbCategoriaIngreso.setBorder(javax.swing.BorderFactory.createTitledBorder("Categoría"));
 
-        txtFechaIngreso.setText("Fecha ingreso");
+        txtFechaIngreso.setBorder(javax.swing.BorderFactory.createTitledBorder("Fecha (YYYY-MM-DD)"));
 
         btnGuardarIngreso.setText("Guardar Ingreso");
-        btnGuardarIngreso.addActionListener(this::btnGuardarIngresoActionPerformed);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtMontoIngreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDescIngreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFuente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbCuentaIngreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbCategoriaIngreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFechaIngreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnGuardarIngreso))
-                .addGap(0, 173, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnGuardarIngreso)
+                    .addComponent(txtMontoIngreso)
+                    .addComponent(txtDescIngreso)
+                    .addComponent(txtFuente)
+                    .addComponent(cbCuentaIngreso, 0, 250, Short.MAX_VALUE)
+                    .addComponent(cbCategoriaIngreso, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtFechaIngreso))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -214,152 +184,17 @@ public class FormularioTransaccionView extends javax.swing.JFrame {
                 .addComponent(cbCategoriaIngreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtFechaIngreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addComponent(btnGuardarIngreso)
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Registrar Ingreso", jPanel2);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(58, Short.MAX_VALUE)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(47, 47, 47))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
-        );
-
+        getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void txtMontoGastoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtMontoGastoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtMontoGastoActionPerformed
-
-    private void cbCuentaGastoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbCuentaGastoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbCuentaGastoActionPerformed
-
-    private void btnGuardarGastoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarGastoActionPerformed
-        try {
-            // 1. Validar y Obtener datos básicos
-            double monto = Double.parseDouble(txtMontoGasto.getText());
-            String desc = txtDescGasto.getText();
-            String comercio = txtComercio.getText();
-            String fechaStr = txtFechaGasto.getText(); // Esperamos YYYY-MM-DD
-            
-            // Convertir String a Timestamp (añadiendo hora 00:00:00)
-            Timestamp fecha = Timestamp.valueOf(fechaStr + " 00:00:00");
-
-            // 2. Obtener objetos seleccionados de los ComboBox
-            Cuenta cuentaSelec = (Cuenta) cbCuentaGasto.getSelectedItem();
-            Categoria catSelec = (Categoria) cbCategoriaGasto.getSelectedItem();
-            MetodoPago metodoSelec = (MetodoPago) cbMetodoPago.getSelectedItem();
-
-            if (cuentaSelec == null || catSelec == null || metodoSelec == null) {
-                JOptionPane.showMessageDialog(this, "Faltan datos por seleccionar.");
-                return;
-            }
-
-            // 3. Crear el objeto Gasto
-            Gasto nuevoGasto = new Gasto(
-                monto, 
-                fecha, 
-                desc, 
-                comercio, 
-                cuentaSelec.getId(), 
-                metodoSelec.getId(), 
-                catSelec.getId(), 
-                Sesion.getUsuario().getId()
-            );
-
-            // 4. Guardar en BD
-            if (transaccionDAO.registrarGasto(nuevoGasto)) {
-                JOptionPane.showMessageDialog(this, "¡Gasto registrado y saldo actualizado!");
-                this.dispose(); // Cerrar ventana
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al registrar el gasto.");
-            }
-
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "El monto debe ser un número válido.");
-        } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(this, "Formato de fecha incorrecto (Use YYYY-MM-DD).");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error desconocido: " + e.getMessage());
-        }
-    }//GEN-LAST:event_btnGuardarGastoActionPerformed
-
-    private void btnGuardarIngresoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarIngresoActionPerformed
-        try {
-            double monto = Double.parseDouble(txtMontoIngreso.getText());
-            String desc = txtDescIngreso.getText();
-            String fuente = txtFuente.getText();
-            Timestamp fecha = Timestamp.valueOf(txtFechaIngreso.getText() + " 00:00:00");
-
-            Cuenta cuentaSelec = (Cuenta) cbCuentaIngreso.getSelectedItem();
-            Categoria catSelec = (Categoria) cbCategoriaIngreso.getSelectedItem();
-
-            if (cuentaSelec == null || catSelec == null) {
-                JOptionPane.showMessageDialog(this, "Selecciona cuenta y categoría.");
-                return;
-            }
-
-            Ingreso nuevoIngreso = new Ingreso(
-                monto,
-                fecha,
-                desc,
-                fuente,
-                cuentaSelec.getId(),
-                catSelec.getId(),
-                Sesion.getUsuario().getId()
-            );
-
-            if (transaccionDAO.registrarIngreso(nuevoIngreso)) {
-                JOptionPane.showMessageDialog(this, "¡Ingreso registrado! Dinero añadido.");
-                this.dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Error al registrar ingreso.");
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error en los datos: " + e.getMessage());
-        }
-    }//GEN-LAST:event_btnGuardarIngresoActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new FormularioTransaccionView().setVisible(true));
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardarGasto;

@@ -18,14 +18,13 @@ public class Gasto {
     private String descripcion;
     private String comercio;
     private int idCuenta;
-    private int idMetodoPago; // Ahora obligatorio
+    private int idMetodoPago;
     private int idCategoria;
     private int idUsuario;
 
     public Gasto() {
     }
 
-    // Constructor actualizado: incluye idMetodoPago
     public Gasto(double monto, Timestamp fecha, String descripcion, String comercio, int idCuenta, int idMetodoPago, int idCategoria, int idUsuario) {
         this.monto = monto;
         this.fecha = fecha;

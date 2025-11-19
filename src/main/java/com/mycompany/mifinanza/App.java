@@ -10,7 +10,9 @@ package com.mycompany.mifinanza;
  */
 
 import com.formdev.flatlaf.FlatLightLaf;
-import com.mycompany.mifinanza.views.MainView;
+import com.mycompany.mifinanza.controllers.LoginController;
+import com.mycompany.mifinanza.dao.UsuarioDAO;
+import com.mycompany.mifinanza.views.LoginView;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -25,12 +27,19 @@ public class App {
             System.err.println("Error al iniciar el tema visual");
         }
 
-        // 2. Iniciar la ventana principal
+        // 2. Iniciar la aplicación con el patrón MVC
         SwingUtilities.invokeLater(() -> {
-            com.mycompany.mifinanza.views.LoginView view = new com.mycompany.mifinanza.views.LoginView();
-            // Centrar la ventana en la pantalla
-            view.setLocationRelativeTo(null);
-            view.setVisible(true);
+            // Crear instancias del Modelo, Vista y Controlador
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            LoginView loginView = new LoginView();
+            LoginController loginController = new LoginController(loginView, usuarioDAO);
+
+            // Iniciar el controlador para configurar los listeners
+            loginController.initController();
+            
+            // Centrar y mostrar la vista
+            loginView.setLocationRelativeTo(null);
+            loginView.setVisible(true);
         });
     }
 }

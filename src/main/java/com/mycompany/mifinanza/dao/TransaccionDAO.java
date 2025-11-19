@@ -37,7 +37,7 @@ public class TransaccionDAO {
             // 2. Insertar el Gasto
             pstmtInsert = conn.prepareStatement(sqlInsert);
             pstmtInsert.setDouble(1, gasto.getMonto());
-            pstmtInsert.setString(2, gasto.getFecha().toString()); // Guardamos Timestamp como texto ISO para SQLite
+            pstmtInsert.setString(2, gasto.getFecha().toString()); 
             pstmtInsert.setString(3, gasto.getDescripcion());
             pstmtInsert.setString(4, gasto.getComercio());
             pstmtInsert.setInt(5, gasto.getIdCuenta());

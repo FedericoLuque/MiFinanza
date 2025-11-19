@@ -63,19 +63,28 @@ public class PresupuestoDAO {
             System.out.println("Error al crear presupuesto: " + e.getMessage());
             return false;
         } finally {
-            // Cerrar recursos... (omisión por brevedad, pero recomendable)
+            try {
+                if (pstmt1 != null) pstmt1.close();
+            } catch (SQLException e) {
+                System.out.println("Error cerrando pstmt1: " + e.getMessage());
+            }
+            try {
+                if (pstmt2 != null) pstmt2.close();
+            } catch (SQLException e) {
+                System.out.println("Error cerrando pstmt2: " + e.getMessage());
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.out.println("Error cerrando conexión: " + e.getMessage());
+            }
         }
     }
 
-    // LISTAR PRESUPUESTOS CON PROGRESO (La consulta mágica)
+    // LISTAR PRESUPUESTOS CON PROGRESO
     public List<Presupuesto> listarConProgreso(int idUsuario) {
         List<Presupuesto> lista = new ArrayList<>();
         
-        // Esta consulta hace:
-        // 1. Selecciona los presupuestos del usuario.
-        // 2. Hace JOIN con Categoria para saber el nombre.
-        // 3. Hace una SUB-CONSULTA (SELECT SUM...) a la tabla Gasto para ver cuánto se ha gastado 
-        //    en esa categoría dentro del rango de fechas del presupuesto.
         String sql = """
             SELECT p.id, p.monto_asignado, p.fecha_inicio, p.fecha_fin, p.id_categoria, c.nombre as nombre_cat,
             (
