@@ -4,57 +4,132 @@
  */
 package com.mycompany.mifinanza.dao;
 
-/**
- *
- * @author alumnadotarde
- */
-
 import com.mycompany.mifinanza.database.DatabaseConnection;
 import com.mycompany.mifinanza.models.Categoria;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+/**
+ *
+ * @author alumnadotarde
+ */
 public class CategoriaDAO {
 
-    // INSERTAR
-    public boolean insertar(Categoria cat) {
-        String sql = "INSERT INTO Categoria(nombre) VALUES(?)";
-        try (Connection conn = DatabaseConnection.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, cat.getNombre());
-            pstmt.executeUpdate();
+    public boolean insertar(Categoria cat, Integer parentId) {
+        String sqlCat = "INSERT INTO Categoria(nombre) VALUES(?)";
+        String sqlSub = "INSERT INTO Subcategoria(id_categoria_hija, id_categoria_padre) VALUES(?, ?)";
+        
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.connect();
+            conn.setAutoCommit(false);
+
+            // 1. Insertar en la tabla Categoria
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlCat, Statement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, cat.getNombre());
+                pstmt.executeUpdate();
+                
+                // Obtener el ID generado para la nueva categoría
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        cat.setId(generatedKeys.getInt(1));
+                    } else {
+                        throw new SQLException("Error al obtener ID de categoría nueva.");
+                    }
+                }
+            }
+
+            // 2. Si es una subcategoría, insertarla en la tabla de relación
+            if (parentId != null) {
+                try (PreparedStatement pstmtSub = conn.prepareStatement(sqlSub)) {
+                    pstmtSub.setInt(1, cat.getId());
+                    pstmtSub.setInt(2, parentId);
+                    pstmtSub.executeUpdate();
+                }
+            }
+            
+            conn.commit();
             return true;
+
         } catch (SQLException e) {
             System.out.println("Error al insertar categoría: " + e.getMessage());
-            return false;
-        }
-    }
-
-    // LISTAR TODAS
-    public List<Categoria> listar() {
-        List<Categoria> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Categoria";
-        try (Connection conn = DatabaseConnection.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            
-            while (rs.next()) {
-                lista.add(new Categoria(
-                    rs.getInt("id"),
-                    rs.getString("nombre")
-                ));
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    System.out.println("Error en rollback: " + ex.getMessage());
+                }
             }
-        } catch (SQLException e) {
-            System.out.println("Error al listar categorías: " + e.getMessage());
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    System.out.println("Error cerrando conexión: " + e.getMessage());
+                }
+            }
         }
-        return lista;
     }
 
-    // ACTUALIZAR
+    public List<Categoria> listarJerarquia() {
+        List<Categoria> todasLasCategorias = new ArrayList<>();
+        // 1. Obtener todas las categorías y sus relaciones de padre
+        String sql = """
+            SELECT c.id, c.nombre, s.id_categoria_padre
+            FROM Categoria c
+            LEFT JOIN Subcategoria s ON c.id = s.id_categoria_hija
+        """;
+        
+        try (Connection conn = DatabaseConnection.connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Categoria cat = new Categoria(rs.getInt("id"), rs.getString("nombre"));
+                // El getInt() devuelve 0 si el valor es SQL NULL, lo cual es un problema.
+                // Usamos getObject para poder chequear si es null.
+                Integer parentId = (Integer) rs.getObject("id_categoria_padre");
+                cat.setParentId(parentId);
+                todasLasCategorias.add(cat);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error al listar jerarquía de categorías: " + e.getMessage());
+            return new ArrayList<>(); // Devolver lista vacía en caso de error
+        }
+
+        // 2. Construir la jerarquía en Java
+        // Creamos un mapa para encontrar categorías por su ID fácilmente
+        Map<Integer, Categoria> mapaCategorias = todasLasCategorias.stream()
+                .collect(Collectors.toMap(Categoria::getId, cat -> cat));
+
+        // Lista que contendrá solo las categorías de nivel superior (padres)
+        List<Categoria> categoriasPadre = new ArrayList<>();
+
+        for (Categoria cat : todasLasCategorias) {
+            if (cat.getParentId() != null) {
+                // Es una subcategoría, encontrar a su padre y añadirla
+                Categoria padre = mapaCategorias.get(cat.getParentId());
+                if (padre != null) {
+                    padre.addSubCategoria(cat);
+                }
+            } else {
+                // Es una categoría de nivel superior
+                categoriasPadre.add(cat);
+            }
+        }
+        
+        return categoriasPadre;
+    }
+
     public boolean actualizar(Categoria cat) {
         String sql = "UPDATE Categoria SET nombre = ? WHERE id = ?";
         try (Connection conn = DatabaseConnection.connect();
@@ -69,13 +144,13 @@ public class CategoriaDAO {
         }
     }
 
-    // ELIMINAR
     public boolean eliminar(int id) {
         String sql = "DELETE FROM Categoria WHERE id = ?";
         try (Connection conn = DatabaseConnection.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
+            // La BD se encarga de borrar de la tabla Subcategoria por el ON DELETE CASCADE
             return true;
         } catch (SQLException e) {
             System.out.println("Error al eliminar categoría: " + e.getMessage());

@@ -7,10 +7,15 @@ import com.mycompany.mifinanza.models.Presupuesto;
 import com.mycompany.mifinanza.utils.Sesion;
 import com.mycompany.mifinanza.views.ModalCrearPresupuesto;
 import com.mycompany.mifinanza.views.PresupuestosView;
+import java.awt.Component;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 
 public class PresupuestosController {
@@ -41,12 +46,22 @@ public class PresupuestosController {
     private void abrirModalParaCrear() {
         modal = new ModalCrearPresupuesto(view, true);
 
-        // Cargar categorías en el ComboBox del modal
-        List<Categoria> categorias = categoriaDAO.listar();
-        modal.setCategoriasModel(new DefaultComboBoxModel(categorias.toArray()));
+        // Cargar categorías en el ComboBox del modal con jerarquía
+        List<Categoria> categoriasRaiz = categoriaDAO.listarJerarquia();
+        List<Categoria> flatCategorias = new ArrayList<>();
+        for (Categoria cat : categoriasRaiz) {
+            flatCategorias.add(cat);
+            // Solo añadimos un nivel de subcategorías para presupuestos
+            flatCategorias.addAll(cat.getSubCategorias());
+        }
+
+        DefaultComboBoxModel<Categoria> catModel = new DefaultComboBoxModel<>(flatCategorias.toArray(new Categoria[0]));
+        modal.setCategoriasModel(catModel);
+
+        // Asignar un Renderer custom para la indentación visual
+        modal.getCbCategoria().setRenderer(new CategoriaRenderer());
 
         // Quitar listeners viejos y poner el nuestro
-        // (Esto es por seguridad si el modal es reutilizado)
         for (var listener : modal.getBtnGuardar().getActionListeners()) {
             modal.getBtnGuardar().removeActionListener(listener);
         }
@@ -86,6 +101,23 @@ public class PresupuestosController {
             JOptionPane.showMessageDialog(modal, "El monto debe ser un número válido.");
         } catch (DateTimeParseException e) {
             JOptionPane.showMessageDialog(modal, "El formato de fecha es incorrecto. Usa YYYY-MM-DD.");
+        }
+    }
+    
+    // Clase interna para renderizar las categorías con indentación
+    class CategoriaRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            if (value instanceof Categoria) {
+                Categoria cat = (Categoria) value;
+                if (cat.getParentId() != null) {
+                    label.setText("  └ " + cat.getNombre());
+                } else {
+                    label.setText(cat.getNombre());
+                }
+            }
+            return label;
         }
     }
 }
