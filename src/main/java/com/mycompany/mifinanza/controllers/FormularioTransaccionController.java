@@ -11,10 +11,14 @@ import com.mycompany.mifinanza.models.Ingreso;
 import com.mycompany.mifinanza.models.MetodoPago;
 import com.mycompany.mifinanza.utils.Sesion;
 import com.mycompany.mifinanza.views.FormularioTransaccionView;
+import java.awt.Component;
 import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 
 public class FormularioTransaccionController {
@@ -41,15 +45,33 @@ public class FormularioTransaccionController {
 
     private void cargarCombos() {
         int idUsuario = Sesion.getUsuario().getId();
-        
+
+        // Cargar Cuentas
         List<Cuenta> cuentas = cuentaDAO.listarPorUsuario(idUsuario);
         view.setCuentasGastoModel(new DefaultComboBoxModel(cuentas.toArray()));
         view.setCuentasIngresoModel(new DefaultComboBoxModel(cuentas.toArray()));
+
+        // Cargar Categorías en una lista plana
+        List<Categoria> categoriasRaiz = categoriaDAO.listarJerarquia();
+        List<Categoria> flatCategorias = new ArrayList<>();
+        for (Categoria cat : categoriasRaiz) {
+            flatCategorias.add(cat);
+            for (Categoria sub : cat.getSubCategorias()) {
+                flatCategorias.add(sub);
+            }
+        }
         
-        List<Categoria> categorias = categoriaDAO.listar();
-        view.setCategoriasGastoModel(new DefaultComboBoxModel(categorias.toArray()));
-        view.setCategoriasIngresoModel(new DefaultComboBoxModel(categorias.toArray()));
+        // Crear el ComboBoxModel con la lista plana
+        DefaultComboBoxModel<Categoria> catModel = new DefaultComboBoxModel<>(flatCategorias.toArray(new Categoria[0]));
+        view.setCategoriasGastoModel(catModel);
+        view.setCategoriasIngresoModel(catModel); // Usar el mismo modelo
         
+        // Asignar un Renderer custom para la indentación visual
+        var renderer = new CategoriaRenderer();
+        view.getCbCategoriaGasto().setRenderer(renderer);
+        view.getCbCategoriaIngreso().setRenderer(renderer);
+
+        // Cargar Métodos de Pago
         List<MetodoPago> metodos = metodoPagoDAO.listar();
         view.setMetodosPagoModel(new DefaultComboBoxModel(metodos.toArray()));
     }
@@ -110,6 +132,26 @@ public class FormularioTransaccionController {
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(view, "Error en los datos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    // Clase interna para renderizar las categorías con indentación
+    class CategoriaRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            // Llama al método de la superclase para obtener el JLabel por defecto
+            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            
+            if (value instanceof Categoria) {
+                Categoria cat = (Categoria) value;
+                // Si la categoría tiene un padre, añade una indentación
+                if (cat.getParentId() != null) {
+                    label.setText("  └ " + cat.getNombre());
+                } else {
+                    label.setText(cat.getNombre());
+                }
+            }
+            return label;
         }
     }
 }
