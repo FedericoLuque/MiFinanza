@@ -11,8 +11,7 @@ CREATE TABLE IF NOT EXISTS Usuario (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL,
-    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
+    password TEXT NOT NULL
 );
 
 -- 2. Tabla de Cuentas
@@ -31,7 +30,7 @@ CREATE TABLE IF NOT EXISTS Categoria (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL,
     descripcion TEXT,
-    parent_id INTEGER, -- Clave foránea a sí misma para subcategorías
+    parent_id INTEGER,
     FOREIGN KEY (parent_id) REFERENCES Categoria (id) ON DELETE SET NULL
 );
 
@@ -49,7 +48,7 @@ CREATE TABLE IF NOT EXISTS Ingreso (
     monto REAL NOT NULL CHECK(monto > 0),
     fecha DATE NOT NULL,
     descripcion TEXT,
-    fuente TEXT, -- De dónde proviene el ingreso (ej: nombre de la empresa)
+    fuente TEXT,
     id_cuenta INTEGER NOT NULL,
     id_categoria INTEGER NOT NULL,
     id_usuario INTEGER NOT NULL,
@@ -65,7 +64,7 @@ CREATE TABLE IF NOT EXISTS Gasto (
     monto REAL NOT NULL CHECK(monto > 0),
     fecha DATE NOT NULL,
     descripcion TEXT,
-    comercio TEXT, -- Dónde se realizó el gasto
+    comercio TEXT,
     id_cuenta INTEGER NOT NULL,
     id_metodopago INTEGER NOT NULL,
     id_categoria INTEGER NOT NULL,
