@@ -64,7 +64,7 @@ public class CategoriasView extends javax.swing.JFrame {
 
         // Panel para botones de acciones
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
-        btnAnadirRaiz = new JButton("Añadir Raíz");
+        btnAnadirRaiz = new JButton("Añadir Categoria");
         btnAnadirSub = new JButton("Añadir Sub");
         btnRenombrar = new JButton("Renombrar");
         btnEliminar = new JButton("Eliminar");

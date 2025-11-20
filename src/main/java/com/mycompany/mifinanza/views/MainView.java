@@ -4,6 +4,7 @@ import com.mycompany.mifinanza.controllers.CategoriasController;
 import com.mycompany.mifinanza.controllers.CuentasController;
 import com.mycompany.mifinanza.controllers.DashboardController;
 import com.mycompany.mifinanza.controllers.FormularioTransaccionController;
+import com.mycompany.mifinanza.controllers.HistorialTransaccionesController;
 import com.mycompany.mifinanza.controllers.PresupuestosController;
 import com.mycompany.mifinanza.dao.CategoriaDAO;
 import com.mycompany.mifinanza.dao.CuentaDAO;
@@ -54,17 +55,6 @@ public class MainView extends javax.swing.JFrame {
         lblSaludo.setFont(new Font("Segoe UI", Font.BOLD, 32));
         lblSaludo.setForeground(new Color(33, 33, 33)); // Gris oscuro elegante
 
-        // Botón de Cerrar Sesión (Pequeño y discreto)
-        JButton btnLogout = new JButton("Cerrar Sesión");
-        btnLogout.setBackground(new Color(255, 235, 238)); // Rojo muy suave
-        btnLogout.setForeground(new Color(211, 47, 47));
-        btnLogout.setFocusPainted(false);
-        btnLogout.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-        btnLogout.addActionListener(e -> cerrarSesion());
-
-        panelHeader.add(lblSaludo, BorderLayout.WEST);
-        panelHeader.add(btnLogout, BorderLayout.EAST);
-
         // --- ZONA CENTRAL (GRID DE MENÚ) ---
         // Usamos GridLayout de 2 filas y 3 columnas con espacio de 20px
         JPanel panelMenu = new JPanel(new GridLayout(2, 3, 25, 25));
@@ -77,7 +67,31 @@ public class MainView extends javax.swing.JFrame {
         panelMenu.add(crearTarjetaMenu("📊", "Dashboard", "Ver Estadísticas", new Color(156, 39, 176), e -> abrirDashboard()));
         panelMenu.add(crearTarjetaMenu("📉", "Presupuestos", "Metas de Ahorro", new Color(255, 152, 0), e -> abrirPresupuestos()));
         panelMenu.add(crearTarjetaMenu("🏷️", "Categorías", "Editar Etiquetas", new Color(96, 125, 139), e -> abrirCategorias()));
-        panelMenu.add(crearTarjetaMenu("⚙️", "Ajustes", "Configuración", new Color(121, 85, 72), e -> abrirConfiguracion()));
+        panelMenu.add(crearTarjetaMenu("📜", "Historial", "Ver Transacciones", new Color(121, 85, 72), e -> abrirHistorialTransacciones()));
+
+        // --- ZONA DE BOTONES DE ACCIÓN RÁPIDA (HEADER) ---
+        JPanel panelAcciones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        panelAcciones.setOpaque(false);
+
+        JButton btnAjustes = new JButton("Ajustes");
+        btnAjustes.setBackground(new Color(240, 240, 240));
+        btnAjustes.setForeground(new Color(50, 50, 50));
+        btnAjustes.setFocusPainted(false);
+        btnAjustes.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        btnAjustes.addActionListener(e -> abrirConfiguracion());
+
+        JButton btnLogout = new JButton("Cerrar Sesión");
+        btnLogout.setBackground(new Color(255, 235, 238));
+        btnLogout.setForeground(new Color(211, 47, 47));
+        btnLogout.setFocusPainted(false);
+        btnLogout.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        btnLogout.addActionListener(e -> cerrarSesion());
+
+        panelAcciones.add(btnAjustes);
+        panelAcciones.add(btnLogout);
+
+        panelHeader.add(lblSaludo, BorderLayout.WEST);
+        panelHeader.add(panelAcciones, BorderLayout.EAST);
 
         panelPrincipal.add(panelHeader, BorderLayout.NORTH);
         panelPrincipal.add(panelMenu, BorderLayout.CENTER);
@@ -166,6 +180,14 @@ public class MainView extends javax.swing.JFrame {
 
     private void abrirConfiguracion() {
         new ConfiguracionView().setVisible(true);
+    }
+
+    private void abrirHistorialTransacciones() {
+        HistorialTransaccionesView view = new HistorialTransaccionesView();
+        TransaccionDAO dao = new TransaccionDAO();
+        HistorialTransaccionesController controller = new HistorialTransaccionesController(view, dao);
+        controller.initController();
+        view.setVisible(true);
     }
 
     private void cerrarSesion() {

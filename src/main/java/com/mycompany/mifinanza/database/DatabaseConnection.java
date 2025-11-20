@@ -34,8 +34,5 @@ public class DatabaseConnection {
         return conn;
     }
     
-    // Método MAIN temporal para probar la conexión
-    public static void main(String[] args) {
-        connect();
-    }
+
 }

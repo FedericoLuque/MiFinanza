@@ -22,44 +22,26 @@ import java.util.List;
 public class PresupuestoDAO {
 
     public boolean insertar(Presupuesto p, int idUsuario) {
-        // Insertamos el presupuesto y también lo vinculamos al usuario en la tabla intermedia
-        String sqlPresupuesto = "INSERT INTO Presupuesto(monto_asignado, fecha_inicio, fecha_fin, id_categoria) VALUES(?, ?, ?, ?)";
-        String sqlVinculo = "INSERT INTO Presupuesto_Usuario(id_presupuesto, id_usuario) VALUES(?, ?)";
+        String sqlPresupuesto = "INSERT INTO Presupuesto(monto_total, fecha_inicio, fecha_fin, id_categoria, id_usuario) VALUES(?, ?, ?, ?, ?)";
         
         Connection conn = null;
         PreparedStatement pstmt1 = null;
-        PreparedStatement pstmt2 = null;
         
         try {
             conn = DatabaseConnection.connect();
-            conn.setAutoCommit(false); // Transacción
             
             // 1. Insertar Presupuesto
-            pstmt1 = conn.prepareStatement(sqlPresupuesto, PreparedStatement.RETURN_GENERATED_KEYS);
-            pstmt1.setDouble(1, p.getMontoAsignado());
+            pstmt1 = conn.prepareStatement(sqlPresupuesto);
+            pstmt1.setDouble(1, p.getMontoTotal());
             pstmt1.setString(2, p.getFechaInicio().toString());
             pstmt1.setString(3, p.getFechaFin().toString());
             pstmt1.setInt(4, p.getIdCategoria());
+            pstmt1.setInt(5, idUsuario);
             pstmt1.executeUpdate();
             
-            // Obtener el ID generado
-            ResultSet rs = pstmt1.getGeneratedKeys();
-            int idPresupuesto = 0;
-            if (rs.next()) {
-                idPresupuesto = rs.getInt(1);
-            }
-            
-            // 2. Vincular con Usuario
-            pstmt2 = conn.prepareStatement(sqlVinculo);
-            pstmt2.setInt(1, idPresupuesto);
-            pstmt2.setInt(2, idUsuario);
-            pstmt2.executeUpdate();
-            
-            conn.commit();
             return true;
             
         } catch (SQLException e) {
-            if (conn != null) try { conn.rollback(); } catch (SQLException ex) {}
             System.out.println("Error al crear presupuesto: " + e.getMessage());
             return false;
         } finally {
@@ -67,11 +49,6 @@ public class PresupuestoDAO {
                 if (pstmt1 != null) pstmt1.close();
             } catch (SQLException e) {
                 System.out.println("Error cerrando pstmt1: " + e.getMessage());
-            }
-            try {
-                if (pstmt2 != null) pstmt2.close();
-            } catch (SQLException e) {
-                System.out.println("Error cerrando pstmt2: " + e.getMessage());
             }
             try {
                 if (conn != null) conn.close();
@@ -86,19 +63,11 @@ public class PresupuestoDAO {
         List<Presupuesto> lista = new ArrayList<>();
         
         String sql = """
-            SELECT p.id, p.monto_asignado, p.fecha_inicio, p.fecha_fin, p.id_categoria, c.nombre as nombre_cat,
-            (
-                SELECT IFNULL(SUM(g.monto), 0) 
-                FROM Gasto g 
-                WHERE g.id_usuario = pu.id_usuario 
-                AND g.id_categoria = p.id_categoria 
-                AND g.fecha >= p.fecha_inicio 
-                AND g.fecha <= p.fecha_fin
-            ) as total_gastado
+            SELECT p.id, p.monto_total, p.monto_actual, p.fecha_inicio, p.fecha_fin, p.id_categoria, c.nombre as nombre_cat
             FROM Presupuesto p
-            JOIN Presupuesto_Usuario pu ON p.id = pu.id_presupuesto
             JOIN Categoria c ON p.id_categoria = c.id
-            WHERE pu.id_usuario = ?
+            WHERE p.id_usuario = ?
+            ORDER BY p.fecha_fin DESC
         """;
         
         try (Connection conn = DatabaseConnection.connect();
@@ -110,14 +79,12 @@ public class PresupuestoDAO {
             while (rs.next()) {
                 Presupuesto p = new Presupuesto();
                 p.setId(rs.getInt("id"));
-                p.setMontoAsignado(rs.getDouble("monto_asignado"));
+                p.setMontoTotal(rs.getDouble("monto_total"));
+                p.setMontoActual(rs.getDouble("monto_actual"));
                 p.setFechaInicio(LocalDate.parse(rs.getString("fecha_inicio")));
                 p.setFechaFin(LocalDate.parse(rs.getString("fecha_fin")));
                 p.setIdCategoria(rs.getInt("id_categoria"));
-                
-                // Datos calculados
                 p.setNombreCategoria(rs.getString("nombre_cat"));
-                p.setMontoGastado(rs.getDouble("total_gastado"));
                 
                 lista.add(p);
             }

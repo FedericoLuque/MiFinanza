@@ -8,23 +8,25 @@ package com.mycompany.mifinanza.models;
  *
  * @author federico
  */
-import java.sql.Timestamp;
+import java.sql.Date;
 
 public class Ingreso {
     private int id;
     private double monto;
-    private Timestamp fecha;
+    private Date fecha;
     private String descripcion;
     private String fuente;
     private int idCuenta;
     private int idCategoria;
     private int idUsuario;
+    private String categoria;
+    private String cuenta;
 
     public Ingreso() {
     }
 
     // Constructor para la inserción
-    public Ingreso(double monto, Timestamp fecha, String descripcion, String fuente, int idCuenta, int idCategoria, int idUsuario) {
+    public Ingreso(double monto, Date fecha, String descripcion, String fuente, int idCuenta, int idCategoria, int idUsuario) {
         this.monto = monto;
         this.fecha = fecha;
         this.descripcion = descripcion;
@@ -41,8 +43,8 @@ public class Ingreso {
     public double getMonto() { return monto; }
     public void setMonto(double monto) { this.monto = monto; }
 
-    public Timestamp getFecha() { return fecha; }
-    public void setFecha(Timestamp fecha) { this.fecha = fecha; }
+    public Date getFecha() { return fecha; }
+    public void setFecha(Date fecha) { this.fecha = fecha; }
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
@@ -58,4 +60,10 @@ public class Ingreso {
 
     public int getIdUsuario() { return idUsuario; }
     public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
+    
+    public String getCategoria() { return categoria; }
+    public void setCategoria(String categoria) { this.categoria = categoria; }
+    
+    public String getCuenta() { return cuenta; }
+    public void setCuenta(String cuenta) { this.cuenta = cuenta; }
 }
