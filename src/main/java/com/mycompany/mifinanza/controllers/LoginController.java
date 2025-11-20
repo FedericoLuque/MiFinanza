@@ -5,6 +5,7 @@ import com.mycompany.mifinanza.models.Usuario;
 import com.mycompany.mifinanza.utils.Sesion;
 import com.mycompany.mifinanza.views.LoginView;
 import com.mycompany.mifinanza.views.MainView;
+import com.mycompany.mifinanza.views.RegistroUsuarioView;
 import javax.swing.JOptionPane;
 
 public class LoginController {
@@ -19,6 +20,7 @@ public class LoginController {
 
     public void initController() {
         view.getBtnLogin().addActionListener(e -> login());
+        view.getBtnNuevoUsuario().addActionListener(e -> openRegistroUsuario());
     }
 
     private void login() {
@@ -46,5 +48,12 @@ public class LoginController {
         } else {
             JOptionPane.showMessageDialog(view, "Email o contraseña incorrectos.", "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    private void openRegistroUsuario() {
+        RegistroUsuarioView registroView = new RegistroUsuarioView(view);
+        RegistroUsuarioController registroController = new RegistroUsuarioController(registroView, usuarioDAO);
+        registroController.initController();
+        registroView.setVisible(true);
     }
 }
