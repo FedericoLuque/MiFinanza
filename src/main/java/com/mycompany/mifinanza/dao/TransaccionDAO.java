@@ -55,7 +55,11 @@ public class TransaccionDAO {
             pstmtUpdate.setInt(2, gasto.getIdCuenta());
             pstmtUpdate.executeUpdate();
 
-            // 4. Si todo salió bien, confirmamos los cambios (Commit)
+            // 4. Actualizar el monto actual del presupuesto
+            PresupuestoDAO presupuestoDAO = new PresupuestoDAO();
+            presupuestoDAO.actualizarMontoActual(conn, gasto.getIdCategoria(), gasto.getMonto());
+
+            // 5. Si todo salió bien, confirmamos los cambios (Commit)
             conn.commit();
             return true;
 

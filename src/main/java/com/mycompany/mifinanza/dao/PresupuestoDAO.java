@@ -93,4 +93,17 @@ public class PresupuestoDAO {
         }
         return lista;
     }
+    public void actualizarMontoActual(Connection conn, int idCategoria, double montoGastado) throws SQLException {
+        String sql = """
+            UPDATE Presupuesto
+            SET monto_actual = monto_actual + ?
+            WHERE id_categoria = ? AND fecha_inicio <= CURRENT_DATE AND fecha_fin >= CURRENT_DATE
+        """;
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, montoGastado);
+            pstmt.setInt(2, idCategoria);
+            pstmt.executeUpdate();
+        }
+    }
 }
