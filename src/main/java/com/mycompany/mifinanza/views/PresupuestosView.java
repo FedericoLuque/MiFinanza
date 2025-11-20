@@ -52,16 +52,16 @@ public class PresupuestosView extends javax.swing.JFrame {
                 headerPanel.add(lblCategoria, BorderLayout.WEST);
                 headerPanel.add(lblFechas, BorderLayout.EAST);
                 
-                JProgressBar progressBar = new JProgressBar(0, (int) p.getMontoAsignado());
-                progressBar.setValue((int) p.getMontoGastado());
+                JProgressBar progressBar = new JProgressBar(0, (int) p.getMontoTotal());
+                progressBar.setValue((int) p.getMontoActual());
                 progressBar.setStringPainted(true);
                 
-                if (p.getMontoGastado() > p.getMontoAsignado()) {
+                if (p.getMontoActual() > p.getMontoTotal()) {
                     progressBar.setForeground(Color.RED);
-                    progressBar.setString("¡EXCEDIDO! " + String.format("%.2f", p.getMontoGastado()) + " / " + String.format("%.2f", p.getMontoAsignado()));
+                    progressBar.setString("¡EXCEDIDO! " + String.format("%.2f", p.getMontoActual()) + " / " + String.format("%.2f", p.getMontoTotal()));
                 } else {
                     progressBar.setForeground(new Color(50, 205, 50));
-                    progressBar.setString("Gastado: " + String.format("%.2f", p.getMontoGastado()) + " / " + String.format("%.2f", p.getMontoAsignado()));
+                    progressBar.setString("Gastado: " + String.format("%.2f", p.getMontoActual()) + " / " + String.format("%.2f", p.getMontoTotal()));
                 }
 
                 card.add(headerPanel);

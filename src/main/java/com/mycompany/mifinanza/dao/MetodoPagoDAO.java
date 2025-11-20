@@ -29,7 +29,7 @@ public class MetodoPagoDAO {
             while (rs.next()) {
                 lista.add(new MetodoPago(
                     rs.getInt("id"),
-                    rs.getString("nombre")
+                    rs.getString("nombre_metodo")
                 ));
             }
         } catch (Exception e) {

@@ -12,7 +12,7 @@ import com.mycompany.mifinanza.models.MetodoPago;
 import com.mycompany.mifinanza.utils.Sesion;
 import com.mycompany.mifinanza.views.FormularioTransaccionView;
 import java.awt.Component;
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -73,6 +73,9 @@ public class FormularioTransaccionController {
 
         // Cargar Métodos de Pago
         List<MetodoPago> metodos = metodoPagoDAO.listar();
+        if (metodos.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "No se encontraron métodos de pago.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }
         view.setMetodosPagoModel(new DefaultComboBoxModel(metodos.toArray()));
     }
 
@@ -81,7 +84,7 @@ public class FormularioTransaccionController {
             double monto = Double.parseDouble(view.getTxtMontoGasto().getText());
             String desc = view.getTxtDescGasto().getText();
             String comercio = view.getTxtComercio().getText();
-            Timestamp fecha = Timestamp.valueOf(view.getTxtFechaGasto().getText() + " 00:00:00");
+            Date fecha = Date.valueOf(view.getTxtFechaGasto().getText()); // Usar java.sql.Date
 
             Cuenta cuentaSelec = (Cuenta) view.getCbCuentaGasto().getSelectedItem();
             Categoria catSelec = (Categoria) view.getCbCategoriaGasto().getSelectedItem();
@@ -112,7 +115,7 @@ public class FormularioTransaccionController {
             double monto = Double.parseDouble(view.getTxtMontoIngreso().getText());
             String desc = view.getTxtDescIngreso().getText();
             String fuente = view.getTxtFuente().getText();
-            Timestamp fecha = Timestamp.valueOf(view.getTxtFechaIngreso().getText() + " 00:00:00");
+            Date fecha = Date.valueOf(view.getTxtFechaIngreso().getText());
 
             Cuenta cuentaSelec = (Cuenta) view.getCbCuentaIngreso().getSelectedItem();
             Categoria catSelec = (Categoria) view.getCbCategoriaIngreso().getSelectedItem();

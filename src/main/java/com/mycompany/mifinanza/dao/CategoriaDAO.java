@@ -23,8 +23,7 @@ import java.util.stream.Collectors;
 public class CategoriaDAO {
 
     public boolean insertar(Categoria cat, Integer parentId) {
-        String sqlCat = "INSERT INTO Categoria(nombre) VALUES(?)";
-        String sqlSub = "INSERT INTO Subcategoria(id_categoria_hija, id_categoria_padre) VALUES(?, ?)";
+        String sqlCat = "INSERT INTO Categoria(nombre, parent_id) VALUES(?, ?)";
         
         Connection conn = null;
         try {
@@ -34,6 +33,11 @@ public class CategoriaDAO {
             // 1. Insertar en la tabla Categoria
             try (PreparedStatement pstmt = conn.prepareStatement(sqlCat, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, cat.getNombre());
+                if (parentId != null) {
+                    pstmt.setInt(2, parentId);
+                } else {
+                    pstmt.setNull(2, java.sql.Types.INTEGER);
+                }
                 pstmt.executeUpdate();
                 
                 // Obtener el ID generado para la nueva categoría
@@ -43,15 +47,6 @@ public class CategoriaDAO {
                     } else {
                         throw new SQLException("Error al obtener ID de categoría nueva.");
                     }
-                }
-            }
-
-            // 2. Si es una subcategoría, insertarla en la tabla de relación
-            if (parentId != null) {
-                try (PreparedStatement pstmtSub = conn.prepareStatement(sqlSub)) {
-                    pstmtSub.setInt(1, cat.getId());
-                    pstmtSub.setInt(2, parentId);
-                    pstmtSub.executeUpdate();
                 }
             }
             
@@ -82,11 +77,7 @@ public class CategoriaDAO {
     public List<Categoria> listarJerarquia() {
         List<Categoria> todasLasCategorias = new ArrayList<>();
         // 1. Obtener todas las categorías y sus relaciones de padre
-        String sql = """
-            SELECT c.id, c.nombre, s.id_categoria_padre
-            FROM Categoria c
-            LEFT JOIN Subcategoria s ON c.id = s.id_categoria_hija
-        """;
+        String sql = "SELECT id, nombre, parent_id FROM Categoria";
         
         try (Connection conn = DatabaseConnection.connect();
              Statement stmt = conn.createStatement();
@@ -96,7 +87,7 @@ public class CategoriaDAO {
                 Categoria cat = new Categoria(rs.getInt("id"), rs.getString("nombre"));
                 // El getInt() devuelve 0 si el valor es SQL NULL, lo cual es un problema.
                 // Usamos getObject para poder chequear si es null.
-                Integer parentId = (Integer) rs.getObject("id_categoria_padre");
+                Integer parentId = (Integer) rs.getObject("parent_id");
                 cat.setParentId(parentId);
                 todasLasCategorias.add(cat);
             }
@@ -106,8 +97,7 @@ public class CategoriaDAO {
             return new ArrayList<>(); // Devolver lista vacía en caso de error
         }
 
-        // 2. Construir la jerarquía en Java
-        // Creamos un mapa para encontrar categorías por su ID fácilmente
+        // Construir la jerarquía en Java
         Map<Integer, Categoria> mapaCategorias = todasLasCategorias.stream()
                 .collect(Collectors.toMap(Categoria::getId, cat -> cat));
 
@@ -150,7 +140,6 @@ public class CategoriaDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
-            // La BD se encarga de borrar de la tabla Subcategoria por el ON DELETE CASCADE
             return true;
         } catch (SQLException e) {
             System.out.println("Error al eliminar categoría: " + e.getMessage());

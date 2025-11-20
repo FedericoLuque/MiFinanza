@@ -12,31 +12,32 @@ import java.time.LocalDate;
 
 public class Presupuesto {
     private int id;
-    private double montoAsignado;
+    private double montoTotal;
+    private double montoActual;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
     private int idCategoria;
-    
-    
-    private double montoGastado; // Para la barra de progreso
     private String nombreCategoria; // Para mostrar en la lista
 
     public Presupuesto() {
     }
 
-    public Presupuesto(double montoAsignado, LocalDate fechaInicio, LocalDate fechaFin, int idCategoria) {
-        this.montoAsignado = montoAsignado;
+    public Presupuesto(double montoTotal, LocalDate fechaInicio, LocalDate fechaFin, int idCategoria) {
+        this.montoTotal = montoTotal;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.idCategoria = idCategoria;
     }
 
-    // Getters y Setters básicos
+    // Getters y Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public double getMontoAsignado() { return montoAsignado; }
-    public void setMontoAsignado(double montoAsignado) { this.montoAsignado = montoAsignado; }
+    public double getMontoTotal() { return montoTotal; }
+    public void setMontoTotal(double montoTotal) { this.montoTotal = montoTotal; }
+
+    public double getMontoActual() { return montoActual; }
+    public void setMontoActual(double montoActual) { this.montoActual = montoActual; }
 
     public LocalDate getFechaInicio() { return fechaInicio; }
     public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
@@ -46,10 +47,6 @@ public class Presupuesto {
 
     public int getIdCategoria() { return idCategoria; }
     public void setIdCategoria(int idCategoria) { this.idCategoria = idCategoria; }
-    
-    // Getters y Setters auxiliares
-    public double getMontoGastado() { return montoGastado; }
-    public void setMontoGastado(double montoGastado) { this.montoGastado = montoGastado; }
 
     public String getNombreCategoria() { return nombreCategoria; }
     public void setNombreCategoria(String nombreCategoria) { this.nombreCategoria = nombreCategoria; }
