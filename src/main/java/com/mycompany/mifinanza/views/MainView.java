@@ -119,10 +119,9 @@ public class MainView extends javax.swing.JFrame {
         btn.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 6, 0, 0, colorBorde), // Borde de color a la izquierda
                 BorderFactory.createEmptyBorder(10, 10, 10, 10) // Relleno
-        ));
-
+        )); 
         // Efecto de sombra suave
-        btn.putClientProperty(FlatClientProperties.STYLE, "arc: 15; hoverBackground: #F5F5F5");
+        btn.putClientProperty(FlatClientProperties.STYLE, "hoverBackground: #F5F5F5");
 
         btn.addActionListener(accion);
         return btn;
